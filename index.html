@@ -1225,19 +1225,55 @@
       }
     }, { passive: true });
 
-    /* ── Formulaire feedback ── */
-    document.getElementById('contactForm').addEventListener('submit', (e) => {
+  </script>
+
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <script>
+    /* ── Initialisation EmailJS ── */
+    emailjs.init("F6A2ArcG_Cno7qb1m");
+
+    /* ── Formulaire de contact ── */
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
       e.preventDefault();
+
       const btn = e.target.querySelector('button[type="submit"]');
-      btn.textContent = '✓ Message envoyé !';
-      btn.style.background = '#2ecc40';
-      btn.style.borderColor = '#2ecc40';
-      setTimeout(() => {
-        btn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i>Envoyer le message';
-        btn.style.background = '';
-        btn.style.borderColor = '';
-        e.target.reset();
-      }, 3000);
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Envoi en cours...';
+      btn.disabled = true;
+
+      const templateParams = {
+        from_name:  document.getElementById('nom').value,
+        from_email: document.getElementById('email').value,
+        subject:    document.getElementById('sujet').value,
+        message:    document.getElementById('message').value,
+      };
+
+      emailjs.send("service_gmail", "template_fpltrat", templateParams)
+        .then(function() {
+          btn.innerHTML = '<i class="fa-solid fa-check me-2"></i>Message envoyé !';
+          btn.style.background = '#2ecc40';
+          btn.style.borderColor = '#2ecc40';
+          e.target.reset();
+          setTimeout(function() {
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane me-2"></i>Envoyer le message';
+            btn.style.background = '';
+            btn.style.borderColor = '';
+            btn.disabled = false;
+          }, 4000);
+        })
+        .catch(function(error) {
+          console.error('Erreur EmailJS :', error);
+          btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-2"></i>Erreur, réessayez.';
+          btn.style.background = '#e74c3c';
+          btn.style.borderColor = '#e74c3c';
+          btn.disabled = false;
+          setTimeout(function() {
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane me-2"></i>Envoyer le message';
+            btn.style.background = '';
+            btn.style.borderColor = '';
+          }, 4000);
+        });
     });
   </script>
 </body>
